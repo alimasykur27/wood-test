@@ -1,2 +1,3 @@
 # wood-test
-Software for wood testing using frequency analysis
+
+Python Qt5 project for wood testing using frequency analysis. This project is used for research in universitas gadjah mada
