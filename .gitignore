@@ -130,3 +130,7 @@ dmypy.json
 
 # wave test files
 *.wav
+
+# Pyproject files for Qt Designer
+*.pyproject
+*.user
