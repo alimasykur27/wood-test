@@ -41,6 +41,9 @@ def read_audio(path=None):
     return samprate_audio, audio
 
 def generate_noise_sample(noise, samprate_noise, length):
+    """
+    Generate a random sample of noise with the same length as the audio clip
+    """
     noise_clip = noise[:samprate_noise*length]
     noise_clip = np.asarray(noise_clip, dtype=float)
     return noise_clip
@@ -87,6 +90,21 @@ def remove_noise(audio,
                 verbose=False, 
                 visual=False):
 
+    """
+    Remove noise from audio signal using spectral subtraction
+    :param audio: audio signal
+    :param noise_clip: noise signal
+    :param n_grad_freq: number of frequency channels over which the gradient is computed
+    :param n_grad_time: number of frames over which the gradient is computed
+    :param n_fft: number of FFT components
+    :param win_length: window length
+    :param hop_length: hop length
+    :param n_std_th: number of standard deviations for the power threshold
+    :param prop_decrease: proportion of noise decrease
+    :param verbose: print information
+    :param visual: plot information
+    :return: audio without noise
+    """
     # Short-time Fourier transform (STFT) of noise
     if verbose:
         start = time.time()

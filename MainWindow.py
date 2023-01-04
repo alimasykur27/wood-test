@@ -5,11 +5,13 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import numpy as np
+import noisereduction as nr
+from spectrum import *
+from matplotlib.ticker import MultipleLocator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene
 from ui_mainwindow import Ui_MainWindow
 from Recorder import Recorder
-import NoiseReduction as nr
 
 class MainWindow(QMainWindow):
     ui = None
@@ -17,6 +19,9 @@ class MainWindow(QMainWindow):
     devices = None
 
     def __init__(self, parent=None):
+        """
+        Constructor
+        """
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -63,6 +68,10 @@ class MainWindow(QMainWindow):
         self.ui.noiseKayu.clicked.connect(lambda: self.noiseReduction("kayu"))
 
     def process(self, type=None):
+        """
+        Process audio
+        """
+        print("=====\t Process \t=====")
         # record audio and save to file
         try:
             self.recorder.record()
@@ -98,6 +107,9 @@ class MainWindow(QMainWindow):
             self.plot(index=2, type="kayu")
 
     def noiseReduction(self, type=None):
+        """
+        Noise Reduction
+        """
         print("=====\t Noise Reduction \t=====")
 
         # get audio and noise
@@ -150,11 +162,9 @@ class MainWindow(QMainWindow):
 
         # show audio waveform
         if type == "background":
-            self.plotNoiseRed(type="background")
+            self.plotfft(type="background")
         elif type == "kayu":
-            self.plotNoiseRed(type="kayu")
-        elif type == "kayu-bg":
-            self.plotNoiseRed(type="kayu-bg")
+            self.plotfft(type="kayu")
 
     def save_fft(self, filename=None, output=None):
         print("Save FFT: " + filename)
@@ -188,33 +198,32 @@ class MainWindow(QMainWindow):
                 self.ui.mdKayu.setScene(scene)
             elif index == 2:
                 self.ui.mjKayu.setScene(scene)
-                
-    def plotNoiseRed(self, type=None):
+    
+    def plotfft(self, type=None):
         if type == "background":
-            print("Plot Background Noise Reduction")
-        elif type == "kayu":
-            wood = self.ui.namaKayu.text()
-            print("Plot Kayu " + wood + " Noise Reduction")
-
-        if type == "background":
+            print("Plot Background FFT")
             audio = "background_fft.wav"
+
         elif type == "kayu":
-        #     wood = self.ui.namaKayu.text()
-        #     audio = wood + "_fft.wav"
-        # elif type == "kayu-bg":
             wood = self.ui.namaKayu.text()
+            print("Plot Kayu " + wood + " FFT")
             audio = wood + "_final_fft.wav"
         
-        scene = self.draw_plot(audio_name=audio, size=(21, 5))
-
+        scene = self.draw_plotfft(audio_name=audio, size=(27, 8))
+        
         if type == "background":
             self.ui.fftBG.setScene(scene)
         elif type == "kayu":
             self.ui.fftKayu.setScene(scene)
-        # elif type == "kayu-bg":
-            # self.ui.fftMulti.setScene(scene)
 
     def draw_plot(self, audio_name=None, size=None):
+        """
+        Plot the audio signal in time domain
+        param audio_name: audio file name
+        param size: size of plot
+        return scene: plot in scene
+        """
+        
         if audio_name == None:
             return
 
@@ -224,12 +233,42 @@ class MainWindow(QMainWindow):
         # size in px
         figure = plt.figure(figsize=size, dpi=50)
         axes = figure.gca()
-        axes.set_title('Audio Signal in Time Domain', size=12)
+        axes.set_title('Audio Signal in Time Domain', size=20)
+        axes.set_xlabel('Time (s)', size=17)
+        axes.set_ylabel('Amplitude (dB)', size=17)
         librosa.display.waveshow(x, sr)
-        axes.set_xlabel('Time (s)', size=12)
-        axes.set_ylabel('Amplitude (dB)', size=12)
 
-        # put figure to scene
+        # put figure to center of scene
+        scene = QGraphicsScene()
+        scene.addWidget(FigureCanvas(figure))
+
+        return scene
+    
+    def draw_plotfft(self, audio_name=None, size=None):
+        """
+        Plot the audio signal in frequency domain
+        param audio_name: audio file name
+        param size: size of plot
+        return scene: plot in scene
+        """
+        if audio_name == None:
+            return
+
+        # Plot the audio signal in frequency domain
+        fs, data = wavfile.read(audio_name)
+        convertFromPSD = 10 ** (-80/20)
+        dB = data*convertFromPSD
+        
+        figure = plt.figure(figsize=size, dpi=50)
+        axes = figure.gca()
+        axes.set_title('Audio Signal in Frequency Domain', size=12)
+        axes.set_xlabel('Frequency (Hz)', size=12)
+        axes.set_ylabel('Amplitude (dB)', size=12)
+        axes.set_xlim(0, 22000)
+        axes.xaxis.set_major_locator(MultipleLocator(1000))
+        axes.yaxis.set_major_locator(MultipleLocator(5))
+        p = WelchPeriodogram(dB, NFFT=1024, sampling=fs)
+
         scene = QGraphicsScene()
         scene.addWidget(FigureCanvas(figure))
 
