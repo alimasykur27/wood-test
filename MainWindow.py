@@ -1,12 +1,15 @@
 import pyaudio
+import scipy.io.wavfile as wavfile
 import wave
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene
 from ui_mainwindow import Ui_MainWindow
 from Recorder import Recorder
+import NoiseReduction as nr
 
 class MainWindow(QMainWindow):
     ui = None
@@ -37,7 +40,7 @@ class MainWindow(QMainWindow):
         self.ui.pbBG.clicked.connect(lambda: self.process("background"))
 
         # Noise Reduction button clicked and callback function with parameter
-        self.ui.noiseBG.clicked.connect(lambda: self.noise_reduction("background"))
+        self.ui.noiseBG.clicked.connect(lambda: self.noiseReduction("background"))
 
         # === Kayu Tab ===
         # add device list to combobox
@@ -57,11 +60,14 @@ class MainWindow(QMainWindow):
         self.ui.pbKayu.clicked.connect(lambda: self.process("kayu"))
 
         # Noise Reduction button clicked and callback function with parameter
-        self.ui.noiseKayu.clicked.connect(lambda: self.noise_reduction("kayu"))
+        self.ui.noiseKayu.clicked.connect(lambda: self.noiseReduction("kayu"))
 
     def process(self, type=None):
         # record audio and save to file
-        self.recorder.record()
+        try:
+            self.recorder.record()
+        except Exception as e:
+            print("[Process Error]: " + e.__str__())
 
         if type == None:
             self.recorder.setFilename_1("output_1.wav")
@@ -85,46 +91,130 @@ class MainWindow(QMainWindow):
 
         # show audio waveform
         if type == "background":
-            self.plotBG(index=1)
-            self.plotBG(index=2)
+            self.plot(index=1, type="background")
+            self.plot(index=2, type="background")
         elif type == "kayu":
-            self.plotKayu(index=1)
-            self.plotKayu(index=2)
+            self.plot(index=1, type="kayu")
+            self.plot(index=2, type="kayu")
 
-    def noise_reduction(self, type=None):
-        print("Noise Reduction")
+    def noiseReduction(self, type=None):
+        print("=====\t Noise Reduction \t=====")
+
+        # get audio and noise
+        if type == "background":
+            audio = "background_1.wav"
+            noise = "background_2.wav"
+
+        elif type == "kayu":
+            wood = self.ui.namaKayu.text()
+            if wood == "" or wood == None:
+                wood = "kayu"
+            else:
+                wood = self.ui.namaKayu.text()
+            
+            audio = wood + "_1.wav"
+            noise = wood + "_2.wav"
         
+        elif type == "kayu-bg":
+            wood = self.ui.namaKayu.text()
+            if wood == "" or wood == None:
+                wood = "kayu"
+            else:
+                wood = self.ui.namaKayu.text()
 
-    def plotBG(self, index=None):
-        print("Plot Background")
+            audio = wood + "_fft.wav"
+            noise = "background_fft.wav"
+        
+        # load audio and noise
+        samprate_audio, audio = nr.read_audio(audio)
+        samprate_noise, noise = nr.read_audio(noise)
+
+        audio = audio.astype(float)
+        noise_clip = nr.generate_noise_sample(noise=noise, samprate_noise=samprate_noise, length=len(audio))
+        
+        # noise reduction
+        if type == "background":
+            bg_fft = nr.noise_reduction(audio=audio, noise_clip=noise_clip, fft_size=4096, iterations=3)
+            self.save_fft(filename="background_fft.wav", output=bg_fft)
+        
+        elif type == "kayu":
+            kayu_fft = nr.noise_reduction(audio=audio, noise_clip=noise_clip, fft_size=4096, iterations=3)
+            self.save_fft(filename=wood + "_fft.wav", output=kayu_fft)
+
+            # noise reduction kayu - background
+            self.noiseReduction(type="kayu-bg")
+        
+        elif type == "kayu-bg":
+            kayu_bg_fft = nr.noise_reduction_final(audio=audio, noise_clip=noise_clip, fft_size=4096, iterations=7)
+            self.save_fft(filename=wood + "_final_fft.wav", output=kayu_bg_fft)
+
+        # show audio waveform
+        if type == "background":
+            self.plotNoiseRed(type="background")
+        elif type == "kayu":
+            self.plotNoiseRed(type="kayu")
+        elif type == "kayu-bg":
+            self.plotNoiseRed(type="kayu-bg")
+
+    def save_fft(self, filename=None, output=None):
+        print("Save FFT: " + filename)
+
+        if filename == None:
+            filename = "output_fft.wav"
+
+        wavfile.write(filename, 44100, output.astype(np.int16))
+
+    def plot(self, index=None, type=None):
+        if type == "background":
+            print("Plot Background")
+        elif type == "kayu":
+            wood = self.ui.namaKayu.text()
+            print("Plot Kayu " + wood)
 
         if index == 1:
             audio = self.recorder.getFilename_1()
         elif index == 2:
             audio = self.recorder.getFilename_2()
 
-        scene = self.plot(audio_name=audio)
+        scene = self.draw_plot(audio_name=audio, size=(14, 5))
 
-        if index == 1:
-            self.ui.mdBG.setScene(scene)
-        elif index == 2:
-            self.ui.mjBG.setScene(scene)
+        if type == "background":
+            if index == 1:
+                self.ui.mdBG.setScene(scene)
+            elif index == 2:
+                self.ui.mjBG.setScene(scene)
+        elif type == "kayu":
+            if index == 1:
+                self.ui.mdKayu.setScene(scene)
+            elif index == 2:
+                self.ui.mjKayu.setScene(scene)
+                
+    def plotNoiseRed(self, type=None):
+        if type == "background":
+            print("Plot Background Noise Reduction")
+        elif type == "kayu":
+            wood = self.ui.namaKayu.text()
+            print("Plot Kayu " + wood + " Noise Reduction")
 
-    def plotKayu(self, index=None):
-        print("Plot Kayu" + str(index))
-        if index == 1:
-            audio = self.recorder.getFilename_1()
-        elif index == 2:
-            audio = self.recorder.getFilename_2()
+        if type == "background":
+            audio = "background_fft.wav"
+        elif type == "kayu":
+        #     wood = self.ui.namaKayu.text()
+        #     audio = wood + "_fft.wav"
+        # elif type == "kayu-bg":
+            wood = self.ui.namaKayu.text()
+            audio = wood + "_final_fft.wav"
+        
+        scene = self.draw_plot(audio_name=audio, size=(21, 5))
 
-        scene = self.plot(audio_name=audio)
+        if type == "background":
+            self.ui.fftBG.setScene(scene)
+        elif type == "kayu":
+            self.ui.fftKayu.setScene(scene)
+        # elif type == "kayu-bg":
+            # self.ui.fftMulti.setScene(scene)
 
-        if index == 1:
-            self.ui.mdKayu.setScene(scene)
-        elif index == 2:
-            self.ui.mjKayu.setScene(scene)
-
-    def plot(self, audio_name=None):
+    def draw_plot(self, audio_name=None, size=None):
         if audio_name == None:
             return
 
@@ -132,7 +222,7 @@ class MainWindow(QMainWindow):
         x, sr = librosa.load(audio_name)
 
         # size in px
-        figure = plt.figure(figsize=(12, 5), dpi=50)
+        figure = plt.figure(figsize=size, dpi=50)
         axes = figure.gca()
         axes.set_title('Audio Signal in Time Domain', size=12)
         librosa.display.waveshow(x, sr)
