@@ -10,4 +10,5 @@ if __name__ == "__main__":
         window.show()
         sys.exit(app.exec_())
     except Exception as e:
-        print("[Application Error]: " + e)
+        print("[Application Error]: " + e.__str__())
+        

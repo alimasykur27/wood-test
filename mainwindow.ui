@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1303</width>
-    <height>762</height>
+    <height>757</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>40</x>
       <y>90</y>
       <width>1261</width>
       <height>621</height>
@@ -35,7 +35,6 @@
     <property name="font">
      <font>
       <pointsize>10</pointsize>
-      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -88,7 +87,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -100,7 +98,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>30</y>
+        <y>10</y>
         <width>361</width>
         <height>22</height>
        </rect>
@@ -110,7 +108,7 @@
       <property name="geometry">
        <rect>
         <x>880</x>
-        <y>30</y>
+        <y>10</y>
         <width>361</width>
         <height>22</height>
        </rect>
@@ -120,9 +118,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>50</y>
         <width>611</width>
-        <height>211</height>
+        <height>241</height>
        </rect>
       </property>
      </widget>
@@ -130,9 +128,9 @@
       <property name="geometry">
        <rect>
         <x>630</x>
-        <y>60</y>
+        <y>50</y>
         <width>611</width>
-        <height>211</height>
+        <height>241</height>
        </rect>
       </property>
      </widget>
@@ -140,57 +138,17 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>320</y>
+        <y>300</y>
         <width>1231</width>
-        <height>251</height>
+        <height>281</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="noiseBG">
-      <property name="geometry">
-       <rect>
-        <x>565</x>
-        <y>280</y>
-        <width>121</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Noise Reduction</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="saveBG">
-      <property name="geometry">
-       <rect>
-        <x>1150</x>
-        <y>280</y>
-        <width>93</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Simpan</string>
       </property>
      </widget>
      <widget class="QLabel" name="labelMD">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>10</y>
         <width>61</width>
         <height>21</height>
        </rect>
@@ -198,7 +156,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -213,7 +170,7 @@
       <property name="geometry">
        <rect>
         <x>810</x>
-        <y>30</y>
+        <y>10</y>
         <width>61</width>
         <height>21</height>
        </rect>
@@ -221,7 +178,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -240,7 +196,7 @@
      <widget class="QPushButton" name="pbKayu">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>580</x>
         <y>10</y>
         <width>93</width>
         <height>28</height>
@@ -249,7 +205,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -282,8 +237,8 @@
        <rect>
         <x>10</x>
         <y>70</y>
-        <width>601</width>
-        <height>201</height>
+        <width>611</width>
+        <height>221</height>
        </rect>
       </property>
      </widget>
@@ -293,57 +248,17 @@
         <x>630</x>
         <y>70</y>
         <width>611</width>
-        <height>201</height>
+        <height>221</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="noiseKayu">
-      <property name="geometry">
-       <rect>
-        <x>565</x>
-        <y>280</y>
-        <width>111</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Noise Reduction</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="saveKayu">
-      <property name="geometry">
-       <rect>
-        <x>1150</x>
-        <y>280</y>
-        <width>93</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Simpan</string>
       </property>
      </widget>
      <widget class="QGraphicsView" name="fftKayu">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>320</y>
+        <y>300</y>
         <width>1231</width>
-        <height>251</height>
+        <height>281</height>
        </rect>
       </property>
      </widget>
@@ -359,7 +274,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -376,7 +290,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -399,7 +312,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -422,7 +334,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -442,17 +353,17 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>90</y>
         <width>1231</width>
-        <height>461</height>
+        <height>491</height>
        </rect>
       </property>
      </widget>
      <widget class="QPushButton" name="pbUpload">
       <property name="geometry">
        <rect>
-        <x>580</x>
-        <y>60</y>
+        <x>10</x>
+        <y>10</y>
         <width>93</width>
         <height>28</height>
        </rect>
@@ -460,12 +371,59 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
       <property name="text">
        <string>Unggah File</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pbHapus">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>50</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Hapus</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="file_list">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>10</y>
+        <width>441</width>
+        <height>71</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pbRefresh">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>10</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Refresh</string>
       </property>
      </widget>
     </widget>
@@ -482,7 +440,6 @@
     <property name="font">
      <font>
       <pointsize>16</pointsize>
-      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -500,7 +457,7 @@
      <x>0</x>
      <y>0</y>
      <width>1303</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
