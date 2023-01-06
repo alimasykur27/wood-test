@@ -47,6 +47,8 @@ class MainWindow(QMainWindow):
 
         # Noise Reduction button clicked and callback function with parameter
         # self.ui.noiseBG.clicked.connect(lambda: self.noiseReduction("background"))
+        # self.ui.pbBG.clicked.connect(lambda: self.noiseReduction("background"))
+
 
         # === Kayu Tab ===
         # add device list to combobox
@@ -240,7 +242,7 @@ class MainWindow(QMainWindow):
         elif index == 2:
             audio = self.recorder.getFilename_2()
 
-        size = (14, 5)
+        size = (7, 3)
         scene = self.draw_plot(audio_name=audio, size=size)
 
         if type == "background":
@@ -264,7 +266,7 @@ class MainWindow(QMainWindow):
             print("Plot Kayu " + wood + " FFT")
             audio = wood + "_final_fft.wav"
         
-        size = (10, 4)
+        size = (12, 4)
         scene = self.draw_plotfft(audio_name=audio, size=size)
         
         if type == "background":
@@ -290,11 +292,10 @@ class MainWindow(QMainWindow):
         figure = plt.figure(figsize=size, dpi=100)
         axes = figure.gca()
         librosa.display.waveshow(x, sr)
-        axes.set_title('Audio Signal in Time Domain', size=13)
-        axes.set_xlabel('Time (s)', size=10)
-        axes.set_ylabel('Amplitude (dB)', size=10)
+        axes.set_title('Audio Signal in Time Domain', size=10)
+        axes.set_xlabel('Time (s)', size=8)
+        axes.set_ylabel('Amplitude (dB)', size=8)
         
-
         # put figure to center of scene
         scene = QGraphicsScene()
         scene.addWidget(FigureCanvas(figure))
@@ -320,11 +321,11 @@ class MainWindow(QMainWindow):
         figure = plt.figure(figsize=size, dpi=100)
         axes = figure.gca()
         p = WelchPeriodogram(dB, NFFT=2048, sampling=fs, label=audio_name)
-        axes.set_title('Audio Signal in Frequency Domain', size=15)
-        axes.set_xlabel('Frequency (Hz)', size=12)
-        axes.set_ylabel('Amplitude (dB)', size=12)
+        axes.set_title('Audio Signal in Frequency Domain', size=13)
+        axes.set_xlabel('Frequency (Hz)', size=10)
+        axes.set_ylabel('Amplitude (dB)', size=10)
         axes.set_xlim(0, 22000)
-        axes.xaxis.set_major_locator(MultipleLocator(1000))
+        axes.xaxis.set_major_locator(MultipleLocator(2000))
         axes.yaxis.set_major_locator(MultipleLocator(5))
 
         scene = QGraphicsScene()
@@ -354,7 +355,8 @@ class MainWindow(QMainWindow):
 
         # Plot the audio signal in frequency domain
         # size fit to QGraphicView, size to plt.figure is in inch
-        size = (14, 5)
+        h, w = self.ui.fftMulti.size().height(), self.ui.fftMulti.size().width() + 50
+        size = (w/100, h/100)
         figure = plt.figure(figsize=size, dpi=100)
         axes = figure.gca()
         
@@ -371,8 +373,8 @@ class MainWindow(QMainWindow):
         axes.set_title('Audio Signal in Frequency Domain', size=15)
         axes.set_xlabel('Frequency (Hz)', size=12)
         axes.set_ylabel('Amplitude (dB)', size=12)
-        axes.set_xlim(0, 2500)
-        axes.xaxis.set_major_locator(MultipleLocator(200))
+        axes.set_xlim(0, 22000)
+        axes.xaxis.set_major_locator(MultipleLocator(2000))
         axes.yaxis.set_major_locator(MultipleLocator(5))
 
         # set scene size
