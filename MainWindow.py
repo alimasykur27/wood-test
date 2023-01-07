@@ -106,22 +106,22 @@ class MainWindow(QMainWindow):
         print("=====\t Record \t=====")
         # record audio and save to file
         if type == None:
-            self.recorder.setFilename_1("output_1.wav")
-            self.recorder.setFilename_2("output_2.wav")
+            self.recorder.setFilename_MD("output_MD.wav")
+            self.recorder.setFilename_MJ("output_MJ.wav")
 
         elif type == "background":
-            self.recorder.setFilename_1("background_1.wav")
-            self.recorder.setFilename_2("background_2.wav")
+            self.recorder.setFilename_MD("background_MD.wav")
+            self.recorder.setFilename_MJ("background_MJ.wav")
 
         elif type == "kayu":
             wood_name = self.ui.namaKayu.text()
             if wood_name == "" or wood_name == None:
                 wood_name = "kayu"
 
-            filename1 = wood_name + "_1.wav"
-            filename2 = wood_name + "_2.wav"
-            self.recorder.setFilename_1(filename1)
-            self.recorder.setFilename_2(filename2)
+            filename1 = wood_name + "_MD.wav"
+            filename2 = wood_name + "_MJ.wav"
+            self.recorder.setFilename_MD(filename1)
+            self.recorder.setFilename_MJ(filename2)
 
         try:
             self.recorder.record()
@@ -138,8 +138,8 @@ class MainWindow(QMainWindow):
 
         # get audio and noise
         if type == "background":
-            audio = "background_1.wav"
-            noise = "background_2.wav"
+            audio = "background_MJ.wav"
+            noise = "background_MD.wav"
 
         elif type == "kayu":
             wood = self.ui.namaKayu.text()
@@ -148,8 +148,8 @@ class MainWindow(QMainWindow):
             else:
                 wood = self.ui.namaKayu.text()
             
-            audio = wood + "_1.wav"
-            noise = wood + "_2.wav"
+            audio = wood + "_MJ.wav"
+            noise = wood + "_MD.wav"
         
         elif type == "kayu-bg":
             wood = self.ui.namaKayu.text()
@@ -350,8 +350,12 @@ class MainWindow(QMainWindow):
             tmp_convertFromPSD = 10 ** (-80/20)
             tmp_dB = tmp_data*tmp_convertFromPSD
             fs_list.append(tmp_fs)
-            audio_name.append(tmp_name)
             audio_db.append(tmp_dB)
+
+            # parse to get .wav name
+            tmp_name = tmp_name.split("/")[-1]
+            tmp_name = tmp_name.split(".")[0]
+            audio_name.append(tmp_name)
 
         # Plot the audio signal in frequency domain
         # size fit to QGraphicView, size to plt.figure is in inch
@@ -370,11 +374,13 @@ class MainWindow(QMainWindow):
                 label=audio_name[i], 
                 color=color)
 
+            axes.legend(loc='upper right', fontsize=8)
+
         axes.set_title('Audio Signal in Frequency Domain', size=15)
         axes.set_xlabel('Frequency (Hz)', size=12)
         axes.set_ylabel('Amplitude (dB)', size=12)
-        axes.set_xlim(0, 22000)
-        axes.xaxis.set_major_locator(MultipleLocator(2000))
+        axes.set_xlim(0, 5000)
+        axes.xaxis.set_major_locator(MultipleLocator(250))
         axes.yaxis.set_major_locator(MultipleLocator(5))
 
         # set scene size

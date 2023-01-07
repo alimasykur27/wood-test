@@ -10,13 +10,13 @@ class Recorder:
     channels = None
     fs = None
     seconds = None
-    filename_1 = None
-    filename_2 = None
+    filename_MD = None
+    filename_MJ = None
     device_id_1 = None
     device_id_2 = None
 
     def __init__(self, chunk=None, sample_format=None, channels=None,
-                 fs=None, seconds=None, filename_1=None, filename_2=None):
+                 fs=None, seconds=None, filename_MD=None, filename_MJ=None):
 
         if (chunk == None):
             self.chunk = 1024  # Record in default chunks of 1024 samples
@@ -43,15 +43,15 @@ class Recorder:
         else:
             self.seconds = seconds
 
-        if (filename_1 == None):
-            self.filename_1 = "output_1.wav"
+        if (filename_MD == None):
+            self.filename_MD = "output_MD.wav"
         else:
-            self.filename_1 = filename_1
+            self.filename_MD = filename_MD
 
-        if (filename_2 == None):
-            self.filename_2 = "output_2.wav"
+        if (filename_MJ == None):
+            self.filename_MJ = "output_MJ.wav"
         else:
-            self.filename_2 = filename_2
+            self.filename_MJ = filename_MJ
 
         self.p = pyaudio.PyAudio()  # Create an interface to PortAudio
 
@@ -75,23 +75,23 @@ class Recorder:
         print(self.p.get_device_info_by_index(self.device_id_2))
 
 
-    def setFilename_1(self, filename=None):
+    def setfilename_MD(self, filename=None):
         if (filename == None):
-            self.filename_1 = "output_1.wav"
+            self.filename_MD = "output_MD.wav"
         else:
-            self.filename_1 = filename
+            self.filename_MD = filename
 
-    def setFilename_2(self, filename=None):
+    def setfilename_MJ(self, filename=None):
         if (filename == None):
-            self.filename_2 = "output_2.wav"
+            self.filename_MJ = "output_MJ.wav"
         else:
-            self.filename_2 = filename
+            self.filename_MJ = filename
 
-    def getFilename_1(self):
-        return self.filename_1
+    def getfilename_MD(self):
+        return self.filename_MD
     
-    def getFilename_2(self):
-        return self.filename_2
+    def getfilename_MJ(self):
+        return self.filename_MJ
 
     def record(self):
         print("Recording...")
@@ -134,14 +134,14 @@ class Recorder:
     def save(self):
         print("Saving...")
         # Save the recorded data as a WAV file
-        wf1 = wave.open(self.filename_1, "wb")
+        wf1 = wave.open(self.filename_MD, "wb")
         wf1.setnchannels(self.channels)
         wf1.setsampwidth(self.p.get_sample_size(self.sample_format))
         wf1.setframerate(self.fs)
         wf1.writeframes(b"".join(self.frames1))
         wf1.close()
 
-        wf2 = wave.open(self.filename_2, "wb")
+        wf2 = wave.open(self.filename_MJ, "wb")
         wf2.setnchannels(self.channels)
         wf2.setsampwidth(self.p.get_sample_size(self.sample_format))
         wf2.setframerate(self.fs)
