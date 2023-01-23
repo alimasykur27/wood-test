@@ -1,3 +1,4 @@
+import json
 import random
 import pyaudio
 import scipy.io.wavfile as wavfile
@@ -16,8 +17,9 @@ from Recorder import Recorder
 
 class MainWindow(QMainWindow):
     ui = None
-    rrecorder = None
+    recorder = None
     devices = None
+    path = "audio/"
 
     def __init__(self, parent=None):
         """
@@ -67,8 +69,9 @@ class MainWindow(QMainWindow):
         # Record button clicked and callback function with parameter
         self.ui.pbKayu.clicked.connect(lambda: self.process("kayu")) # udah langsung ke noise reduction
 
-        # Noise Reduction button clicked and callback function with parameter
-        # self.ui.noiseKayu.clicked.connect(lambda: self.noiseReduction("kayu"))
+        # Noise Reduction button clicked and callback function with parameter for testing
+        # self.ui.pbKayu.clicked.connect(lambda: self.noiseReduction("kayu"))
+        self.ui.pbKayu_analysis.clicked.connect(lambda: self.analysis()) # langsung ke analysis tanpa record
 
         # === FFT Tab ===
         # Upload file button clicked and callback function
@@ -138,8 +141,8 @@ class MainWindow(QMainWindow):
 
         # get audio and noise
         if type == "background":
-            audio = "background_MJ.wav"
-            noise = "background_MD.wav"
+            audio_file = self.path + "background_MJ.wav"
+            noise_file = self.path + "background_MD.wav"
 
         elif type == "kayu":
             wood = self.ui.namaKayu.text()
@@ -148,8 +151,8 @@ class MainWindow(QMainWindow):
             else:
                 wood = self.ui.namaKayu.text()
             
-            audio = wood + "_MJ.wav"
-            noise = wood + "_MD.wav"
+            audio_file = self.path + wood + "_MJ.wav"
+            noise_file = self.path + wood + "_MD.wav"
         
         elif type == "kayu-bg":
             wood = self.ui.namaKayu.text()
@@ -158,12 +161,12 @@ class MainWindow(QMainWindow):
             else:
                 wood = self.ui.namaKayu.text()
 
-            audio = wood + "_fft.wav"
-            noise = "background_fft.wav"
+            audio_file = self.path + wood + "_MJ.wav"
+            noise_file = self.path + "background_fft.wav"
         
         # load audio and noise
-        samprate_audio, audio = nr.read_audio(audio)
-        samprate_noise, noise = nr.read_audio(noise)
+        samprate_audio, audio = nr.read_audio(audio_file)
+        samprate_noise, noise = nr.read_audio(noise_file)
 
         audio = audio.astype(float)
         noise_clip = nr.generate_noise_sample(noise=noise, samprate_noise=samprate_noise, length=len(audio))
@@ -182,13 +185,115 @@ class MainWindow(QMainWindow):
         
         elif type == "kayu-bg":
             kayu_bg_fft = nr.noise_reduction_final(audio=audio, noise_clip=noise_clip, fft_size=4096, iterations=7)
-            self.save_fft(filename=wood + "_final_fft.wav", output=kayu_bg_fft)
+            self.save_fft(filename=wood + ".wav", output=kayu_bg_fft)
+
+            # Analysis
+            self.analysis()
 
         # show audio waveform
         if type == "background":
             self.plotfft(type="background")
         elif type == "kayu":
             self.plotfft(type="kayu")
+        
+    def analysis(self):
+        """
+        Analysis
+        """
+        print("=====\t Analysis \t=====")
+
+        # get audio
+        wood_name = self.ui.namaKayu.text()
+        if wood_name == "" or wood_name == None:
+            wood_name = "kayu"
+        else:
+            wood_name = self.ui.namaKayu.text()
+
+        audio_name = self.path + wood_name + ".wav"
+
+        # load audio
+        fs, data = wavfile.read(audio_name)
+        convertFromPSD = 10**(-75/20)
+        dB = data*convertFromPSD
+
+        # get sinyal psd
+        from pylab import psd
+        sinyal = psd(dB, NFFT=4096, Fs=fs)
+
+        # get resonance frequency
+        res_freq = self.get_resonance_freq(sinyal)
+        print("Resonance Frequency: " + str(res_freq))
+
+        # get class
+        res_class = self.get_wood_class(res_freq)
+        print("Class: " + res_class)
+
+        # show result
+        self.ui.name_label.setText(wood_name)
+        self.ui.frequency_label.setText(str(res_freq))
+        self.ui.kelas_label.setText(res_class)
+
+        # save to database
+        self.save_to_json(wood_name, res_freq, res_class)
+
+    def save_to_json(self, name, freq, res_class):
+        """
+        Save to json
+        """
+        print("=====\t Save to JSON \t=====")
+
+        data = {
+            "filename": name + ".wav", 
+            "name": name,
+            "frequency": freq,
+            "class": res_class
+        }
+
+        # add new data to current json data if json file exist. 
+        # if not exist, create new json file
+
+        if os.path.exists("data.json"):
+            with open("data.json", "r") as f:
+                json_data = json.load(f)
+                json_data.append(data)
+            
+            with open("data.json", "w") as f:
+                json.dump(json_data, f)
+
+        else:
+            with open("data.json", "w") as f:
+                json.dump([data], f)
+
+    def get_resonance_freq(self, sinyal):
+        n = len(sinyal[0])
+        sorted_data0 = sorted(sinyal[0], reverse=True)
+        max_data = -9999
+        max_freq = -9999
+
+        for i in range(0, n):
+            # get freq index of max data
+            idx = np.where(sinyal[0] == sorted_data0[i])
+            tmp_freq = sinyal[1][idx]
+            if tmp_freq > 0 and tmp_freq < 6000:
+                m = 10 * np.log10(sorted_data0[i])
+                if m > -115:
+                    if tmp_freq > max_freq:
+                        max_data = m
+                        max_freq = tmp_freq
+
+        return max_freq[0]
+
+    def get_wood_class(self, freq):
+        if freq < 2250:
+            return "1"
+        elif freq < 3000:
+            return "2"
+        elif freq < 3500:
+            return "3"
+        elif freq < 5000:
+            return "4"
+        else:
+            return "5"
 
     def getAudioFile(self):
         """
@@ -227,8 +332,8 @@ class MainWindow(QMainWindow):
 
         if filename == None:
             filename = "output_fft.wav"
-
-        wavfile.write(filename, 44100, output.astype(np.int16))
+        
+        wavfile.write(self.path + filename, 44100, output.astype(np.int16))
 
     def plot(self, index=None, type=None):
         if type == "background":
@@ -238,9 +343,9 @@ class MainWindow(QMainWindow):
             print("Plot Kayu " + wood)
 
         if index == 1:
-            audio = self.recorder.getFilename_1()
+            audio = self.path + self.recorder.getFilename_MD()
         elif index == 2:
-            audio = self.recorder.getFilename_2()
+            audio = self.path + self.recorder.getFilename_MJ()
 
         size = (7, 3)
         scene = self.draw_plot(audio_name=audio, size=size)
@@ -259,12 +364,12 @@ class MainWindow(QMainWindow):
     def plotfft(self, type=None):
         if type == "background":
             print("Plot Background FFT")
-            audio = "background_fft.wav"
+            audio = self.path + "background_fft.wav"
 
         elif type == "kayu":
             wood = self.ui.namaKayu.text()
             print("Plot Kayu " + wood + " FFT")
-            audio = wood + "_final_fft.wav"
+            audio = self.path + wood + ".wav"
         
         size = (12, 4)
         scene = self.draw_plotfft(audio_name=audio, size=size)
@@ -314,7 +419,7 @@ class MainWindow(QMainWindow):
 
         # Plot the audio signal in frequency domain
         fs, data = wavfile.read(audio_name)
-        convertFromPSD = 10 ** (-80/20)
+        convertFromPSD = 10 ** (-75/20)
         dB = data*convertFromPSD
         
         # size in px
@@ -347,7 +452,7 @@ class MainWindow(QMainWindow):
         for i in range(self.ui.file_list.count()):
             tmp_name = self.ui.file_list.item(i).text()
             tmp_fs, tmp_data = wavfile.read(tmp_name)
-            tmp_convertFromPSD = 10 ** (-80/20)
+            tmp_convertFromPSD = 10 ** (-70/20)
             tmp_dB = tmp_data*tmp_convertFromPSD
             fs_list.append(tmp_fs)
             audio_db.append(tmp_dB)
@@ -379,7 +484,7 @@ class MainWindow(QMainWindow):
         axes.set_title('Audio Signal in Frequency Domain', size=15)
         axes.set_xlabel('Frequency (Hz)', size=12)
         axes.set_ylabel('Amplitude (dB)', size=12)
-        axes.set_xlim(0, 5000)
+        axes.set_xlim(0, 6000)
         axes.xaxis.set_major_locator(MultipleLocator(250))
         axes.yaxis.set_major_locator(MultipleLocator(5))
 

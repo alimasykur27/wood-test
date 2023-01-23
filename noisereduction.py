@@ -77,7 +77,6 @@ def plot_statistics_and_filter(mean_noise, std_noise, noise_th):
     ax.legend()
     plt.show()
 
-
 def remove_noise(audio, 
                 noise_clip, 
                 n_grad_freq=2, 

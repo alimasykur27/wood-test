@@ -14,6 +14,7 @@ class Recorder:
     filename_MJ = None
     device_id_1 = None
     device_id_2 = None
+    path = "audio/"
 
     def __init__(self, chunk=None, sample_format=None, channels=None,
                  fs=None, seconds=None, filename_MD=None, filename_MJ=None):
@@ -75,22 +76,22 @@ class Recorder:
         print(self.p.get_device_info_by_index(self.device_id_2))
 
 
-    def setfilename_MD(self, filename=None):
+    def setFilename_MD(self, filename=None):
         if (filename == None):
             self.filename_MD = "output_MD.wav"
         else:
             self.filename_MD = filename
 
-    def setfilename_MJ(self, filename=None):
+    def setFilename_MJ(self, filename=None):
         if (filename == None):
             self.filename_MJ = "output_MJ.wav"
         else:
             self.filename_MJ = filename
 
-    def getfilename_MD(self):
+    def getFilename_MD(self):
         return self.filename_MD
     
-    def getfilename_MJ(self):
+    def getFilename_MJ(self):
         return self.filename_MJ
 
     def record(self):
@@ -133,15 +134,18 @@ class Recorder:
 
     def save(self):
         print("Saving...")
-        # Save the recorded data as a WAV file
-        wf1 = wave.open(self.filename_MD, "wb")
+        # Save the recorded data as a WAV file in audio folder
+        save_path_MD = self.path + self.filename_MD
+        save_path_MJ = self.path + self.filename_MJ
+
+        wf1 = wave.open(save_path_MD, "wb")
         wf1.setnchannels(self.channels)
         wf1.setsampwidth(self.p.get_sample_size(self.sample_format))
         wf1.setframerate(self.fs)
         wf1.writeframes(b"".join(self.frames1))
         wf1.close()
 
-        wf2 = wave.open(self.filename_MJ, "wb")
+        wf2 = wave.open(save_path_MJ, "wb")
         wf2.setnchannels(self.channels)
         wf2.setsampwidth(self.p.get_sample_size(self.sample_format))
         wf2.setframerate(self.fs)

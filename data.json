@@ -1,0 +1,20 @@
+[
+    {
+        "filename": "angsana jemur.wav",
+        "name": "angsana jemur",
+        "frequency": 3165.380859375,
+        "class": "3"
+    },
+    {
+        "filename": "akasia jemur.wav",
+        "name": "akasia jemur",
+        "frequency": 1388.8916015625,
+        "class": "1"
+    },
+    {
+        "filename": "sungkai jemur.wav",
+        "name": "sungkai jemur",
+        "frequency": 1087.4267578125,
+        "class": "1"
+    }
+]
