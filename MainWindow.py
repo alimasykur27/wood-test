@@ -11,7 +11,7 @@ import noisereduction as nr
 from spectrum import *
 from matplotlib.ticker import MultipleLocator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog, QHeaderView, QTableWidgetItem
 from ui_mainwindow import Ui_MainWindow
 from Recorder import Recorder
 
@@ -51,6 +51,8 @@ class MainWindow(QMainWindow):
         # self.ui.noiseBG.clicked.connect(lambda: self.noiseReduction("background"))
         # self.ui.pbBG.clicked.connect(lambda: self.noiseReduction("background"))
 
+        # Upload file button clicked and callback function
+        self.ui.pbBGUpload.clicked.connect(lambda: self.uploadBGAudio())
 
         # === Kayu Tab ===
         # add device list to combobox
@@ -71,9 +73,9 @@ class MainWindow(QMainWindow):
 
         # Noise Reduction button clicked and callback function with parameter for testing
         # self.ui.pbKayu.clicked.connect(lambda: self.noiseReduction("kayu"))
-        self.ui.pbKayu_analysis.clicked.connect(lambda: self.analysis()) # langsung ke analysis tanpa record
+        self.ui.pbKayu_analyze.clicked.connect(lambda: self.UploadKayuAudio()) # langsung ke analysis tanpa record
 
-        # === FFT Tab ===
+        # === Analysis Tab ===
         # Upload file button clicked and callback function
         self.ui.pbUpload.clicked.connect(lambda: self.getAudioFile())
 
@@ -83,6 +85,18 @@ class MainWindow(QMainWindow):
         # Hapus button clicked and callback function
         self.ui.pbHapus.clicked.connect(lambda: self.clearAudioFile())
 
+        # === Table ===
+        # set table header
+        print("=====\t Table \t=====")
+        print("set table header")
+        self.ui.tableAnalysis.setColumnCount(3)
+        self.ui.tableAnalysis.setHorizontalHeaderLabels(["Nama Kayu", "Frekuensi Resonansi", "Kelas Kuat"])
+        self.ui.tableAnalysis.horizontalHeader().setVisible(True)
+
+        # fit table to content
+        print("fit table to content")
+        self.ui.tableAnalysis.horizontalHeader().setStretchLastSection(True)
+        self.ui.tableAnalysis.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def process(self, type=None):
         """
@@ -92,15 +106,70 @@ class MainWindow(QMainWindow):
         # record audio
         self.record(type=type)
 
+        # get audio file
+        if type == None:
+            file_MD = self.path + "output_MD.wav"
+            file_MJ = self.path + "output_MJ.wav"
+        elif type == "background":
+            file_MD = self.path + "background_MD.wav"
+            file_MJ = self.path + "background_MJ.wav"
+        elif type == "kayu":
+            wood = self.ui.namaKayu.text()
+            if wood == "" or wood == None:
+                wood = "kayu"
+
+            file_MD = self.path + wood + "_MD.wav"
+            file_MJ = self.path + wood + "_MJ.wav"
+
         # show audio waveform
         if type == None:
-            self.plot(index=1, type="output")
-            self.plot(index=2, type="output")
+            self.plot(index=1, type="output", file_name=file_MD)
+            self.plot(index=2, type="output", file_name=file_MJ)
         elif type == "background" or type == "kayu":
-            self.plot(index=1, type=type)
-            self.plot(index=2, type=type)
+            self.plot(index=1, type=type, file_name=file_MD)
+            self.plot(index=2, type=type, file_name=file_MJ)
 
         self.noiseReduction(type=type)
+
+    def UploadKayuAudio(self):
+        """
+        Analyze audio
+        """
+        print("=====\t Analyze \t=====")
+        # get wood name
+        wood_name = self.ui.namaKayu.text()
+        if wood_name == "" or wood_name == None:
+            wood_name = "kayu"
+
+        # get audio file
+        file_MD = self.path + wood_name + "_MD.wav"
+        file_MJ = self.path + wood_name + "_MJ.wav"
+
+        # show audio waveform
+        self.plot(index=1, type="kayu", file_name=file_MD)
+        self.plot(index=2, type="kayu", file_name=file_MJ)
+
+        # show audio fft
+        self.plotfft(type="kayu")
+
+        # Analyze audio
+        self.analysis()
+
+    def uploadBGAudio(self):
+        """
+        Upload background audio
+        """
+        print("=====\t Upload \t=====")
+        # get audio file
+        file_MD = self.path + "background_MD.wav"
+        file_MJ = self.path + "background_MJ.wav"
+
+        # show audio waveform
+        self.plot(index=1, type="background", file_name=file_MD)
+        self.plot(index=2, type="background", file_name=file_MJ)
+
+        # show audio fft
+        self.plotfft(type="background")
 
     def record(self, type=None):
         """
@@ -255,7 +324,18 @@ class MainWindow(QMainWindow):
         if os.path.exists("data.json"):
             with open("data.json", "r") as f:
                 json_data = json.load(f)
-                json_data.append(data)
+
+                # if json file exist, but data is empty
+                if len(json_data) == 0 or json_data == None:
+                    json_data.append(data)
+                
+                else:
+                    # check if data already exist
+                    for i in json_data:
+                        if i["name"] == data["name"] and i["frequency"] == data["frequency"] and i["class"] == data["class"]:
+                            return            
+                        else:
+                            json_data.append(data)
             
             with open("data.json", "w") as f:
                 json.dump(json_data, f)
@@ -263,6 +343,29 @@ class MainWindow(QMainWindow):
         else:
             with open("data.json", "w") as f:
                 json.dump([data], f)
+
+    def get_data_json(self, name=None):
+        """
+        Get data from json
+        """
+        print("=====\t Get Data from JSON \t=====")
+
+        if os.path.exists("data.json") and name != None:
+            with open("data.json", "r") as f:
+                json_data = json.load(f)
+                # if json file exist, but data is empty return None
+                if len(json_data) == 0 or json_data == None:
+                    return None
+                else:
+                    if name == "All":
+                        return json_data
+                    else:
+                        for i in json_data:
+                            if i["name"] == name:
+                                return i
+                        return None
+        else:
+            return None
 
     def get_resonance_freq(self, sinyal):
         n = len(sinyal[0])
@@ -335,20 +438,15 @@ class MainWindow(QMainWindow):
         
         wavfile.write(self.path + filename, 44100, output.astype(np.int16))
 
-    def plot(self, index=None, type=None):
+    def plot(self, index=None, type=None, file_name=None):
         if type == "background":
             print("Plot Background")
         elif type == "kayu":
             wood = self.ui.namaKayu.text()
             print("Plot Kayu " + wood)
 
-        if index == 1:
-            audio = self.path + self.recorder.getFilename_MD()
-        elif index == 2:
-            audio = self.path + self.recorder.getFilename_MJ()
-
         size = (7, 3)
-        scene = self.draw_plot(audio_name=audio, size=size)
+        scene = self.draw_plot(audio_name=file_name, size=size)
 
         if type == "background":
             if index == 1:
@@ -429,8 +527,8 @@ class MainWindow(QMainWindow):
         axes.set_title('Audio Signal in Frequency Domain', size=13)
         axes.set_xlabel('Frequency (Hz)', size=10)
         axes.set_ylabel('Amplitude (dB)', size=10)
-        axes.set_xlim(0, 22000)
-        axes.xaxis.set_major_locator(MultipleLocator(2000))
+        axes.set_xlim(0, 6000)
+        axes.xaxis.set_major_locator(MultipleLocator(250))
         axes.yaxis.set_major_locator(MultipleLocator(5))
 
         scene = QGraphicsScene()
@@ -443,6 +541,9 @@ class MainWindow(QMainWindow):
         Refresh plot for Frequency Analysis
         """
         print("Refresh Plot")
+
+        # remove table 
+        self.remove_data_table()
     
         # Get audio file from list store to list
         audio_db = []
@@ -454,6 +555,7 @@ class MainWindow(QMainWindow):
             tmp_fs, tmp_data = wavfile.read(tmp_name)
             tmp_convertFromPSD = 10 ** (-70/20)
             tmp_dB = tmp_data*tmp_convertFromPSD
+
             fs_list.append(tmp_fs)
             audio_db.append(tmp_dB)
 
@@ -461,6 +563,28 @@ class MainWindow(QMainWindow):
             tmp_name = tmp_name.split("/")[-1]
             tmp_name = tmp_name.split(".")[0]
             audio_name.append(tmp_name)
+
+            # get data analysis
+            from pylab import psd
+            sinyal = psd(tmp_dB, NFFT=4096, Fs=tmp_fs)
+
+            # get resonance frequency
+            res_freq = self.get_resonance_freq(sinyal)
+            print("Resonance Frequency: " + str(res_freq))
+
+            # get class
+            res_class = self.get_wood_class(res_freq)
+            print("Class: " + res_class)
+
+            analyzed_data = {
+                "file_name": tmp_name + ".wav",
+                "name": tmp_name,
+                "frequency": res_freq,
+                "class": res_class
+            }
+
+            # add to table
+            self.add_to_table(data=analyzed_data)
 
         # Plot the audio signal in frequency domain
         # size fit to QGraphicView, size to plt.figure is in inch
@@ -493,6 +617,28 @@ class MainWindow(QMainWindow):
         scene.addWidget(FigureCanvas(figure))
 
         self.ui.fftMulti.setScene(scene)
+
+    def add_to_table(self, data=None):
+        """
+        Add data to table
+        """
+        if data == None:
+            return
+
+        # add to table
+        rowPosition = self.ui.tableAnalysis.rowCount()
+        self.ui.tableAnalysis.insertRow(rowPosition)
+        self.ui.tableAnalysis.setItem(rowPosition, 0, QTableWidgetItem(data['name']))
+        self.ui.tableAnalysis.setItem(rowPosition, 1, QTableWidgetItem(str(data['frequency'])))
+        self.ui.tableAnalysis.setItem(rowPosition, 2, QTableWidgetItem(data['class']))
+
+    def remove_data_table(self):
+        """
+        Remove all data from table
+        """
+        print("Remove data")
+        self.ui.tableAnalysis.clearContents()
+        self.ui.tableAnalysis.setRowCount(0)
 
     def get_device_list(self):
         # Dapatkan jumlah perangkat audio yang tersedia
