@@ -89,13 +89,16 @@ class MainWindow(QMainWindow):
         # set table header
         print("=====\t Table \t=====")
         print("set table header")
-        self.ui.tableAnalysis.setColumnCount(3)
-        self.ui.tableAnalysis.setHorizontalHeaderLabels(["Nama Kayu", "Frekuensi Resonansi", "Kelas Kuat"])
+        self.ui.tableAnalysis.setColumnCount(4)
+        self.ui.tableAnalysis.setHorizontalHeaderLabels(["Nama Kayu", "Frekuensi", "Gain", "Kelas Kuat"])
         self.ui.tableAnalysis.horizontalHeader().setVisible(True)
+        
+        # set color header to gray and text to white
+        self.ui.tableAnalysis.setStyleSheet(
+            "QHeaderView::section { background-color:#808080; color: white; }")
 
         # fit table to content
         print("fit table to content")
-        self.ui.tableAnalysis.horizontalHeader().setStretchLastSection(True)
         self.ui.tableAnalysis.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def process(self, type=None):
@@ -230,7 +233,7 @@ class MainWindow(QMainWindow):
             else:
                 wood = self.ui.namaKayu.text()
 
-            audio_file = self.path + wood + "_MJ.wav"
+            audio_file = self.path + wood + "_fft.wav"
             noise_file = self.path + "background_fft.wav"
         
         # load audio and noise
@@ -282,15 +285,26 @@ class MainWindow(QMainWindow):
 
         # load audio
         fs, data = wavfile.read(audio_name)
-        convertFromPSD = 10**(-75/20)
+        convertFromPSD = 10**(-71.5/20)
         dB = data*convertFromPSD
 
         # get sinyal psd
-        from pylab import psd
-        sinyal = psd(dB, NFFT=4096, Fs=fs)
+        # from pylab import psd
+        # sinyal = psd(dB, NFFT=4096, Fs=fs)
+        size = (11.5, 4)
+        figure = plt.figure(figsize=size, dpi=100)
+        plt.style.use('dark_background')
+        figure.set_facecolor('black')
+        axes = figure.gca()
+        sinyal, spectrum = WelchPeriodogram(dB, NFFT=2048, sampling=fs)
+        axes.set_xlabel('Frekuensi (Hz)', size=10, color='white')
+        axes.set_ylabel('dBe', size=10, color='white')
+        axes.set_xlim(0, 22000)
+        axes.xaxis.set_major_locator(MultipleLocator(4000))
+        axes.yaxis.set_major_locator(MultipleLocator(5))
 
         # get resonance frequency
-        res_freq = self.get_resonance_freq(sinyal)
+        res_freq, res_gain = self.get_freq_gain(sinyal)
         print("Resonance Frequency: " + str(res_freq))
 
         # get class
@@ -299,13 +313,14 @@ class MainWindow(QMainWindow):
 
         # show result
         self.ui.name_label.setText(wood_name)
-        self.ui.frequency_label.setText(str(res_freq))
+        self.ui.frequency_label.setText(str(res_freq) + " Hz")
+        self.ui.gain_label.setText("{:.2f}".format(res_gain) + " dBe")
         self.ui.kelas_label.setText(res_class)
 
         # save to database
-        self.save_to_json(wood_name, res_freq, res_class)
+        self.save_to_json(wood_name, res_freq, res_gain, res_class)
 
-    def save_to_json(self, name, freq, res_class):
+    def save_to_json(self, name, freq, gain, res_class):
         """
         Save to json
         """
@@ -315,6 +330,7 @@ class MainWindow(QMainWindow):
             "filename": name + ".wav", 
             "name": name,
             "frequency": freq,
+            "gain": gain,
             "class": res_class
         }
 
@@ -367,10 +383,10 @@ class MainWindow(QMainWindow):
         else:
             return None
 
-    def get_resonance_freq(self, sinyal):
+    def get_freq_gain(self, sinyal):
         n = len(sinyal[0])
         sorted_data0 = sorted(sinyal[0], reverse=True)
-        max_data = -9999
+        max_gain = -9999
         max_freq = -9999
 
         for i in range(0, n):
@@ -381,10 +397,10 @@ class MainWindow(QMainWindow):
                 m = 10 * np.log10(sorted_data0[i])
                 if m > -115:
                     if tmp_freq > max_freq:
-                        max_data = m
+                        max_gain = m
                         max_freq = tmp_freq
 
-        return max_freq[0]
+        return max_freq[0], max_gain
 
     def get_wood_class(self, freq):
         if freq < 2250:
@@ -569,7 +585,7 @@ class MainWindow(QMainWindow):
             sinyal = psd(tmp_dB, NFFT=4096, Fs=tmp_fs)
 
             # get resonance frequency
-            res_freq = self.get_resonance_freq(sinyal)
+            res_freq, res_gain = self.get_freq_gain(sinyal)
             print("Resonance Frequency: " + str(res_freq))
 
             # get class
@@ -580,6 +596,7 @@ class MainWindow(QMainWindow):
                 "file_name": tmp_name + ".wav",
                 "name": tmp_name,
                 "frequency": res_freq,
+                "gain": res_gain,
                 "class": res_class
             }
 
@@ -629,8 +646,9 @@ class MainWindow(QMainWindow):
         rowPosition = self.ui.tableAnalysis.rowCount()
         self.ui.tableAnalysis.insertRow(rowPosition)
         self.ui.tableAnalysis.setItem(rowPosition, 0, QTableWidgetItem(data['name']))
-        self.ui.tableAnalysis.setItem(rowPosition, 1, QTableWidgetItem(str(data['frequency'])))
-        self.ui.tableAnalysis.setItem(rowPosition, 2, QTableWidgetItem(data['class']))
+        self.ui.tableAnalysis.setItem(rowPosition, 1, QTableWidgetItem(str(data['frequency']) + " Hz"))
+        self.ui.tableAnalysis.setItem(rowPosition, 2, QTableWidgetItem("{:.2f} dBe".format(data['gain'])))
+        self.ui.tableAnalysis.setItem(rowPosition, 3, QTableWidgetItem(data['class']))
 
     def remove_data_table(self):
         """
