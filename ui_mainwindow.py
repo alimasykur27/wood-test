@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
         self.tab_kayu.setObjectName(u"tab_kayu")
         self.pbKayu = QPushButton(self.tab_kayu)
         self.pbKayu.setObjectName(u"pbKayu")
-        self.pbKayu.setGeometry(QRect(30, 330, 93, 26))
+        self.pbKayu.setGeometry(QRect(50, 330, 93, 26))
         self.pbKayu.setFont(font1)
         self.pbKayu.setStyleSheet(u"background-color: red;")
         self.pilihMDK = QComboBox(self.tab_kayu)
@@ -181,60 +181,54 @@ class Ui_MainWindow(object):
         self.labelMJK.setAlignment(Qt.AlignCenter)
         self.widget = QWidget(self.tab_kayu)
         self.widget.setObjectName(u"widget")
-        self.widget.setGeometry(QRect(10, 370, 341, 251))
+        self.widget.setGeometry(QRect(10, 370, 341, 351))
         self.widget.setStyleSheet(u"background-color: white;\n"
 "border:1px solid rgb(184, 184, 184);")
         self.gridLayout = QGridLayout(self.widget)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.name_label = QLabel(self.widget)
+        self.name_label.setObjectName(u"name_label")
+        font3 = QFont()
+        font3.setPointSize(10)
+        self.name_label.setFont(font3)
+        self.name_label.setStyleSheet(u"background-color: #808080;")
+        self.name_label.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.name_label, 0, 1, 1, 1)
+
+        self.kelas_kuat_label = QLabel(self.widget)
+        self.kelas_kuat_label.setObjectName(u"kelas_kuat_label")
+        self.kelas_kuat_label.setFont(font3)
+        self.kelas_kuat_label.setStyleSheet(u"background-color: #808080;")
+        self.kelas_kuat_label.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.kelas_kuat_label, 3, 1, 1, 1)
+
         self.label_3 = QLabel(self.widget)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setMaximumSize(QSize(16777215, 16777215))
-        font3 = QFont()
-        font3.setPointSize(10)
-        font3.setBold(False)
-        self.label_3.setFont(font3)
+        font4 = QFont()
+        font4.setPointSize(10)
+        font4.setBold(False)
+        self.label_3.setFont(font4)
         self.label_3.setStyleSheet(u"background-color: #808080;")
         self.label_3.setWordWrap(True)
 
         self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
 
-        self.kelas_label = QLabel(self.widget)
-        self.kelas_label.setObjectName(u"kelas_label")
-        font4 = QFont()
-        font4.setPointSize(10)
-        self.kelas_label.setFont(font4)
-        self.kelas_label.setStyleSheet(u"background-color: #808080;")
-        self.kelas_label.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout.addWidget(self.kelas_label, 3, 1, 1, 1)
-
         self.label_4 = QLabel(self.widget)
         self.label_4.setObjectName(u"label_4")
-        self.label_4.setFont(font4)
+        self.label_4.setFont(font3)
         self.label_4.setStyleSheet(u"background-color: #808080;")
 
         self.gridLayout.addWidget(self.label_4, 3, 0, 1, 1)
 
         self.label_2 = QLabel(self.widget)
         self.label_2.setObjectName(u"label_2")
-        self.label_2.setFont(font3)
+        self.label_2.setFont(font4)
         self.label_2.setStyleSheet(u"background-color: #808080;")
 
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
-
-        self.name_label = QLabel(self.widget)
-        self.name_label.setObjectName(u"name_label")
-        self.name_label.setFont(font4)
-        self.name_label.setStyleSheet(u"background-color: #808080;")
-        self.name_label.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout.addWidget(self.name_label, 0, 1, 1, 1)
-
-        self.label_11 = QLabel(self.widget)
-        self.label_11.setObjectName(u"label_11")
-        self.label_11.setStyleSheet(u"background-color: #808080;")
-
-        self.gridLayout.addWidget(self.label_11, 2, 0, 1, 1)
 
         self.gain_label = QLabel(self.widget)
         self.gain_label.setObjectName(u"gain_label")
@@ -243,13 +237,51 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.gain_label, 2, 1, 1, 1)
 
+        self.moe_label = QLabel(self.widget)
+        self.moe_label.setObjectName(u"moe_label")
+        self.moe_label.setFont(font3)
+        self.moe_label.setStyleSheet(u"background-color: #808080;")
+        self.moe_label.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.moe_label, 4, 1, 1, 1)
+
         self.frequency_label = QLabel(self.widget)
         self.frequency_label.setObjectName(u"frequency_label")
-        self.frequency_label.setFont(font4)
+        self.frequency_label.setFont(font3)
         self.frequency_label.setStyleSheet(u"background-color: #808080;")
         self.frequency_label.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.frequency_label, 1, 1, 1, 1)
+
+        self.label_11 = QLabel(self.widget)
+        self.label_11.setObjectName(u"label_11")
+        self.label_11.setStyleSheet(u"background-color: #808080;")
+
+        self.gridLayout.addWidget(self.label_11, 2, 0, 1, 1)
+
+        self.label_12 = QLabel(self.widget)
+        self.label_12.setObjectName(u"label_12")
+        self.label_12.setFont(font3)
+        self.label_12.setStyleSheet(u"background-color: #808080;")
+        self.label_12.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.label_12, 4, 0, 1, 1)
+
+        self.label_13 = QLabel(self.widget)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setFont(font3)
+        self.label_13.setStyleSheet(u"background-color: #808080;")
+        self.label_13.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.label_13, 5, 0, 1, 1)
+
+        self.kelas_moe_label = QLabel(self.widget)
+        self.kelas_moe_label.setObjectName(u"kelas_moe_label")
+        self.kelas_moe_label.setFont(font3)
+        self.kelas_moe_label.setStyleSheet(u"background-color: #808080;")
+        self.kelas_moe_label.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.kelas_moe_label, 5, 1, 1, 1)
 
         self.pbKayu_analyze = QPushButton(self.tab_kayu)
         self.pbKayu_analyze.setObjectName(u"pbKayu_analyze")
@@ -302,11 +334,11 @@ class Ui_MainWindow(object):
         self.pbRefresh.setStyleSheet(u"background-color: #ADD8E6;")
         self.fftMulti = QGraphicsView(self.tab_af)
         self.fftMulti.setObjectName(u"fftMulti")
-        self.fftMulti.setGeometry(QRect(440, 150, 1131, 571))
+        self.fftMulti.setGeometry(QRect(490, 150, 1081, 571))
         self.fftMulti.setStyleSheet(u"background-color: black;")
         self.tableAnalysis = QTableWidget(self.tab_af)
         self.tableAnalysis.setObjectName(u"tableAnalysis")
-        self.tableAnalysis.setGeometry(QRect(10, 150, 421, 571))
+        self.tableAnalysis.setGeometry(QRect(10, 150, 461, 571))
         self.tableAnalysis.setStyleSheet(u"color: white;\n"
 "background-color: black;")
         self.tableAnalysis.setLineWidth(1)
@@ -321,7 +353,7 @@ class Ui_MainWindow(object):
         self.tableAnalysis.verticalHeader().setCascadingSectionResizes(False)
         self.label_10 = QLabel(self.tab_af)
         self.label_10.setObjectName(u"label_10")
-        self.label_10.setGeometry(QRect(450, 155, 1111, 31))
+        self.label_10.setGeometry(QRect(490, 155, 1071, 31))
         self.label_10.setFont(font2)
         self.label_10.setStyleSheet(u"color: white;\n"
 "background-color: black;")
@@ -366,14 +398,18 @@ class Ui_MainWindow(object):
         self.labelKayu.setText(QCoreApplication.translate("MainWindow", u"Nama Kayu", None))
         self.labelMDK.setText(QCoreApplication.translate("MainWindow", u"Pilih MD", None))
         self.labelMJK.setText(QCoreApplication.translate("MainWindow", u"Pilih MJ", None))
+        self.name_label.setText(QCoreApplication.translate("MainWindow", u"-", None))
+        self.kelas_kuat_label.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Frekuensi resonansi:", None))
-        self.kelas_label.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Kelas Kuat:", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Kayu:", None))
-        self.name_label.setText(QCoreApplication.translate("MainWindow", u"-", None))
-        self.label_11.setText(QCoreApplication.translate("MainWindow", u"Gain", None))
         self.gain_label.setText(QCoreApplication.translate("MainWindow", u"0 dB", None))
+        self.moe_label.setText(QCoreApplication.translate("MainWindow", u"0 MPa", None))
         self.frequency_label.setText(QCoreApplication.translate("MainWindow", u"0 Hz", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"Nilai Gain", None))
+        self.label_12.setText(QCoreApplication.translate("MainWindow", u"Nilai MOE:", None))
+        self.label_13.setText(QCoreApplication.translate("MainWindow", u"Kelas MOE:", None))
+        self.kelas_moe_label.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.pbKayu_analyze.setText(QCoreApplication.translate("MainWindow", u"Analisis", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Sinyal Audio Mic Dekat Dalam Domain Waktu", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Sinyal Audio Mic Jauh Dalam Domain Waktu", None))

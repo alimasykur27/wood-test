@@ -350,7 +350,7 @@ background-color: black;</string>
      <widget class="QPushButton" name="pbKayu">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>50</x>
         <y>330</y>
         <width>93</width>
         <height>26</height>
@@ -556,7 +556,7 @@ background-color: black;</string>
         <x>10</x>
         <y>370</y>
         <width>341</width>
-        <height>251</height>
+        <height>351</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -564,6 +564,42 @@ background-color: black;</string>
 border:1px solid rgb(184, 184, 184);</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1">
+        <widget class="QLabel" name="name_label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>-</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="kelas_kuat_label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>-</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_3">
          <property name="maximumSize">
@@ -587,24 +623,6 @@ border:1px solid rgb(184, 184, 184);</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="kelas_label">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: #808080;</string>
-         </property>
-         <property name="text">
-          <string>-</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -640,8 +658,21 @@ border:1px solid rgb(184, 184, 184);</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="name_label">
+       <item row="2" column="1">
+        <widget class="QLabel" name="gain_label">
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>0 dB</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="moe_label">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -651,30 +682,7 @@ border:1px solid rgb(184, 184, 184);</string>
           <string notr="true">background-color: #808080;</string>
          </property>
          <property name="text">
-          <string>-</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="styleSheet">
-          <string notr="true">background-color: #808080;</string>
-         </property>
-         <property name="text">
-          <string>Gain</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="gain_label">
-         <property name="styleSheet">
-          <string notr="true">background-color: #808080;</string>
-         </property>
-         <property name="text">
-          <string>0 dB</string>
+          <string>0 MPa</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -693,6 +701,70 @@ border:1px solid rgb(184, 184, 184);</string>
          </property>
          <property name="text">
           <string>0 Hz</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>Nilai Gain</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>Nilai MOE:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>Kelas MOE:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="kelas_moe_label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #808080;</string>
+         </property>
+         <property name="text">
+          <string>-</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -896,9 +968,9 @@ background-color: black;</string>
      <widget class="QGraphicsView" name="fftMulti">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>490</x>
         <y>150</y>
-        <width>1131</width>
+        <width>1081</width>
         <height>571</height>
        </rect>
       </property>
@@ -911,7 +983,7 @@ background-color: black;</string>
        <rect>
         <x>10</x>
         <y>150</y>
-        <width>421</width>
+        <width>461</width>
         <height>571</height>
        </rect>
       </property>
@@ -953,9 +1025,9 @@ background-color: black;</string>
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>490</x>
         <y>155</y>
-        <width>1111</width>
+        <width>1071</width>
         <height>31</height>
        </rect>
       </property>

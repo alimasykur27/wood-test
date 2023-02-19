@@ -12,6 +12,7 @@ from spectrum import *
 from matplotlib.ticker import MultipleLocator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog, QHeaderView, QTableWidgetItem
+from PyQt5 import QtCore
 from ui_mainwindow import Ui_MainWindow
 from Recorder import Recorder
 
@@ -89,10 +90,13 @@ class MainWindow(QMainWindow):
         # set table header
         print("=====\t Table \t=====")
         print("set table header")
-        self.ui.tableAnalysis.setColumnCount(4)
-        self.ui.tableAnalysis.setHorizontalHeaderLabels(["Nama Kayu", "Frekuensi", "Gain", "Kelas Kuat"])
+        self.ui.tableAnalysis.setColumnCount(6)
+        self.ui.tableAnalysis.setHorizontalHeaderLabels(["Nama Kayu", "Frekuensi (Hz)", "Gain (dB)", "Kelas Kuat", "MOE (MPa)", "Kelas MOE"])
         self.ui.tableAnalysis.horizontalHeader().setVisible(True)
-        
+
+        # set table header alignment to center
+        self.ui.tableAnalysis.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+
         # set color header to gray and text to white
         self.ui.tableAnalysis.setStyleSheet(
             "QHeaderView::section { background-color:#808080; color: white; }")
@@ -307,15 +311,25 @@ class MainWindow(QMainWindow):
         res_freq, res_gain = self.get_freq_gain(sinyal)
         print("Resonance Frequency: " + str(res_freq))
 
+        # get MOE value
+        res_moe_value = self.get_MOE_value(res_freq)
+        print("MOE: " + str(res_moe_value))
+
         # get class
         res_class = self.get_wood_class(res_freq)
         print("Class: " + res_class)
 
+        # get MOE class
+        res_moe_class = self.get_MOE_class(res_moe_value)
+        print("MOE Class: " + res_moe_class)
+
         # show result
         self.ui.name_label.setText(wood_name)
         self.ui.frequency_label.setText(str(res_freq) + " Hz")
-        self.ui.gain_label.setText("{:.2f}".format(res_gain) + " dBe")
-        self.ui.kelas_label.setText(res_class)
+        self.ui.gain_label.setText("{:.2f}".format(res_gain) + " dB")
+        self.ui.kelas_kuat_label.setText(res_class)
+        self.ui.moe_label.setText("{:.2f}".format(res_moe_value) + " MPa")
+        self.ui.kelas_moe_label.setText(res_moe_class)
 
         # save to database
         self.save_to_json(wood_name, res_freq, res_gain, res_class)
@@ -402,6 +416,10 @@ class MainWindow(QMainWindow):
 
         return max_freq[0], max_gain
 
+    def get_MOE_value(self, frequency):
+        res = 4 * ((frequency/1000)**2) * (0.3**2) * 740
+        return res
+
     def get_wood_class(self, freq):
         if freq < 2250:
             return "1"
@@ -413,6 +431,18 @@ class MainWindow(QMainWindow):
             return "4"
         else:
             return "5"
+
+    def get_MOE_class(self, MOE_value):
+        if MOE_value < 6864.655:
+            return "5"
+        elif MOE_value < 8825.985:
+            return "4"
+        elif MOE_value < 10983.448:
+            return "3"
+        elif MOE_value < 14709.975:
+            return "2"
+        else:
+            return "1"
 
     def getAudioFile(self):
         """
@@ -588,16 +618,25 @@ class MainWindow(QMainWindow):
             res_freq, res_gain = self.get_freq_gain(sinyal)
             print("Resonance Frequency: " + str(res_freq))
 
+            # get MOE value
+            res_moe_value = self.get_MOE_value(res_freq)
+            print("MOE Value: " + str(res_moe_value))
+
             # get class
             res_class = self.get_wood_class(res_freq)
             print("Class: " + res_class)
+
+            # get MOE class
+            res_moe_class = self.get_MOE_class(res_moe_value)
 
             analyzed_data = {
                 "file_name": tmp_name + ".wav",
                 "name": tmp_name,
                 "frequency": res_freq,
                 "gain": res_gain,
-                "class": res_class
+                "class": res_class,
+                "MOE": res_moe_value,
+                "moe_class": res_moe_class
             }
 
             # add to table
@@ -647,8 +686,10 @@ class MainWindow(QMainWindow):
         self.ui.tableAnalysis.insertRow(rowPosition)
         self.ui.tableAnalysis.setItem(rowPosition, 0, QTableWidgetItem(data['name']))
         self.ui.tableAnalysis.setItem(rowPosition, 1, QTableWidgetItem(str(data['frequency']) + " Hz"))
-        self.ui.tableAnalysis.setItem(rowPosition, 2, QTableWidgetItem("{:.2f} dBe".format(data['gain'])))
+        self.ui.tableAnalysis.setItem(rowPosition, 2, QTableWidgetItem("{:.2f} dB".format(data['gain'])))
         self.ui.tableAnalysis.setItem(rowPosition, 3, QTableWidgetItem(data['class']))
+        self.ui.tableAnalysis.setItem(rowPosition, 4, QTableWidgetItem("{:.2f} MPa".format(data['MOE'])))
+        self.ui.tableAnalysis.setItem(rowPosition, 5, QTableWidgetItem(data['moe_class']))
 
     def remove_data_table(self):
         """
